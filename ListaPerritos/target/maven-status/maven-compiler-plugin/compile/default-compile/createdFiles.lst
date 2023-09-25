@@ -1,0 +1,5 @@
+servlets\SvPerros.class
+servlets\SvPerros$UploadServlet.class
+com\mycompany\listaperritos\resources\JavaEE8Resource.class
+com\mycompany\listaperritos\JAXRSConfiguration.class
+com\mycompany\listaperritos\Perros.class
