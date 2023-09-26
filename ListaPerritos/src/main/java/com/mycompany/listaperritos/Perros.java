@@ -30,9 +30,6 @@ public Perros(){
         this.edad=edad;
     }
 
-    public Perros(String nombre, String raza, String foto, String puntos, String edad) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     //get para acceder a los atributos
     public String getNombre() {
         return nombre;
@@ -75,9 +72,7 @@ public Perros(){
         this.edad = edad;
     }
 
-    public void add(Perros inPerros) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+   
   
 }
 

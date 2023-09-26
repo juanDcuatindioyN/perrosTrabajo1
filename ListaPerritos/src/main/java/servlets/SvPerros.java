@@ -7,6 +7,7 @@ import com.mycompany.listaperritos.Perros;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import javax.servlet.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +18,7 @@ import javax.servlet.http.*;
  */
 @WebServlet(name = "SvPerros", urlPatterns = {"/SvPerros"})
 public class SvPerros extends HttpServlet{
-    ArrayList<Perros> inPerros = new ArrayList<>();
+    ArrayList<Perros> perros = new ArrayList<>();
     
     @Override
     public void init() throws ServletException{
@@ -30,79 +31,86 @@ public class SvPerros extends HttpServlet{
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-        String nombre = request.getParameter("nombre");
-        String raza = request.getParameter("raza");
-        String foto = request.getParameter("foto");
-        String puntos = request.getParameter("puntos");
-        String edad = request.getParameter("edad");
+  
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String nombre = request.getParameter("nombre");
+    String raza = request.getParameter("raza");
+    String foto = request.getParameter("foto");
+    String puntos = request.getParameter("puntos");
+    String edad = request.getParameter("edad");
     
-        Perros inPerros = new Perros(nombre,raza,foto,puntos,edad);
-       inPerros.add(inPerros);
-      
-       guardarPerrosEnArchivo();
-       
-       request.setAttribute("inPerros", inPerros);            
+   
+        System.out.println(nombre);
+        System.out.println(raza);
+        System.out.println(foto);
+        System.out.println(puntos);
+        System.out.println(edad);
+    
+        try {
+            int edadInt = Integer.parseInt(edad);
+            int puntosInt = Integer.parseInt(puntos);
+            Perros inPerro= new Perros(nombre,raza,foto,puntosInt,edadInt);
+            perros.add(inPerro);
+           
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("ups!! error..." + e.getMessage());
+        }
+        guardarDatosDePerrosEnArchivo();
+        
+        request.setAttribute("generoPerros", perros);
+        
+        request.getRequestDispatcher("index.jsp").forward(request,response);
+        
+}
+
+    private void guardarDatosDePerrosEnArchivo() {
+        try {
+            String dataPath=getServletContext().getRealPath("/data");
+            File dataFolder = new File(dataPath);
+            if(!dataFolder.exists()){
+                dataFolder.mkdirs();
+            }
+            String filePath = dataPath + File.separator + "perros.ser";
+            FileOutputStream fw = new FileOutputStream(filePath);
+            ObjectOutputStream pw =new ObjectOutputStream(fw);
+            pw.writeObject(perros);
+            pw.close();
+            System.out.println("se cargo exitosamente" + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("ha ocurrido un error" + e.getMessage());
+        }
     }
     
- 
-   
+    @Override
+    public String getServletInfo(){
+       return"Short description" ;
+    }
     private void cargarPerrosDesdeArchivo(ServletContext servletContext) {
         try {
             String dataPath = servletContext.getRealPath("/data/perros.ser");
+            File archivo = new File (dataPath);
             
-            File archivo= new File (dataPath);
-            if(archivo.exists()){
-                FileInputStream fis = new FileInputStream(dataPath);
-                ObjectInputStream ois = new ObjectInputStream(fis); 
-                
-                inPerros = (ArrayList<Perros>)ois.readObject();
-                ois.close();
-                System.out.println("Datos de los perros cargados exitosamente desde: "+ dataPath);
+        if(archivo.exists()){
+            FileInputStream sw =new FileInputStream(dataPath);
+            try(ObjectInputStream jw= new ObjectInputStream(sw)) {
+                perros = (ArrayList<Perros>) jw.readObject();
+                jw.close();
+            } 
+               System.out.println("buscando en: " + dataPath); 
+            }else{
+            System.out.println("no existe"+ dataPath);
             }
-        } catch (IOException | ClassNotFoundException e) {
+        }catch(EOFException e){
+            System.out.println("completado");
             e.printStackTrace();
-            System.out.println("Error al cargar los datos de los perros: " + e.getMessage());
+        }catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace();
+         
+            System.out.println("error al cargar datos"+ e.getMessage());
         }
     }
-
-    private void guardarPerrosEnArchivo() throws FileNotFoundException {
-        try{
-            String dataPath = getServletContext().getRealPath("/data");
-            File dataFolder = new File(dataPath);
-            if(!dataFolder.exists()){
-                dataFolder.mkdir();
-            }
-        String filePath = dataPath + File.separator + "perros.ser";
-        FileOutputStream fos = new FileOutputStream(filePath);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(inPerros);
-        oos.close();
-            System.out.println("Datos de los perros guardados exitosamente en: " +filePath);
-        } catch (IOException e) {
-           e.printStackTrace();
-            System.out.println("Error al guardar los datos de los perror " + e.getMessage());
-        }
-    }
-    public String getServletInfo(){
-        return "short description";
-    }
-   @WebServlet(name = "UploadServlet", urlPatterns = {"/upload"})
-   @MultipartConfig(location="D:/uploads")public class UploadServlet extends HttpServlet {    
-    private static final long serialVersionUID = 1L;        protected void processRequest(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {        
-    response.setContentType("text/html;charset=UTF-8");        
-    Collection<Part> parts = request.getParts();        for(Part part : parts) 
-           {part.write(getFileName(part));        }    }    
-       @Override protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException 
-       {processRequest(request, response);    }    
-       @Override protected void doPost(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {processRequest(request, response);    }    public String getFileName(Part part) 
-       {String contentHeader = part.getHeader("content-disposition");        
-       String[] subHeaders = contentHeader.split(";");        
-       for(String current : subHeaders) {            
-           if(current.trim().startsWith("filename")) {            	
-               int pos = current.indexOf('=');
-               String fileName = current.substring(pos+1);
-               return fileName.replace("\"", "");}}return null;}} 
-   
+  
 }
 
