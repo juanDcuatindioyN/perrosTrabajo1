@@ -1,3 +1,4 @@
+<%@page import="com.mycompany.listaperritos.metodos"%>
 <%@page import="java.io.IOException"%>
 <%@page import="java.io.ObjectInputStream"%>
 <%@page import="java.io.FileInputStream"%>
@@ -12,26 +13,26 @@
     <div class="row">
         <div class="col-md-4">
             <h2>Ingrese un nuevo perro</h2>
-    <form>
+    <form action="SvPerros" method="POST" >
         <div class="mb-2">
         <label for="nombre" class="form-label">Nombre</label>
-        <input type="text" class="form-control" id="nombre" aria-describedby="basic-addon1">
+        <input type="text" class="form-control" name="nombre" aria-describedby="basic-addon1">
         <div id="nombrePerros" class="form-text"></div>
      </div>
      <div class="mb-2">
         <label for="raza" class="form-label">Raza</label>
-        <input type="text" class="form-control" id="raza" aria-describedby="basic-addon1">
+        <input type="text" class="form-control" name="raza" aria-describedby="basic-addon1">
         <div id="raza" class="form-text"></div>
      </div>
         <div class="mb-2">
         <label for="foto" class="form-label">foto</label>
-        <input type="text" class="form-control" id="foto" aria-describedby="basic-addon1">
+        <input type="text" class="form-control" name="foto" aria-describedby="basic-addon1">
         <div id="foto" class="form-text"></div>
      </div>
        
             <div class="mb-2">
-      <label for="disabledSelect" class="form-label">Puntos</label>
-      <select id="disabledSelect" class="form-select">   
+      <label for="puntos" class="form-label">Puntos</label>
+      <select id="disabledSelect" class="form-select" name="puntos">   
             <option selected>seleccionar</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -47,15 +48,13 @@
             </div>
         <div class="mb-2">
         <label for="edad" class="form-label">Edad</label>
-        <input type="number" class="form-control" id="edad" aria-describedby="basic-addon1">
+        <input type="number" class="form-control" name="edad" aria-describedby="basic-addon1">
         <div id="edad" class="form-text"></div>
      </div>         
         <button type="submit" class="btn btn-primary">insertar perro</button>
     </form>
         </div>
-        <div class="col " >
-            <div class="card">
-                <div class="card-body">
+        <div class="col-md-8 " >
             <table class="table table-striped table-dark ">
                 <thead> 
                     <tr>
@@ -69,22 +68,10 @@
                 </thead>
                 <tbody>
                     <% 
-                    ArrayList<Perros> nuPerros = null;
-                    String dataPath = application.getRealPath("/data/perros.ser");
-                    File archivo = new File(dataPath);
-                    try {
-                            if(archivo.exists() ){
-                            FileInputStream fw = new FileInputStream(dataPath);
-                            ObjectInputStream pw =new ObjectInputStream(fw);
-                            nuPerros = (ArrayList<Perros>) pw.readObject();
-                            pw.close();
-                            System.out.println("se ha cargado en" + dataPath);                            
-                        }                        
-                        } catch (IOException e) {
-                        e.printStackTrace();
-                        }
-                        if(nuPerros != null){
-                        System.out.println("carga de datos" + nuPerros.size()+ "exitoso");
+                    ArrayList<Perros> nuPerros = new ArrayList<>();
+                    ServletContext servletContext = getServletContext();
+                    nuPerros = metodos.cargarPerrosDesdeArchivo(servletContext);
+                    if (nuPerros!= null && !nuPerros.isEmpty()){
                         for(Perros cPerros: nuPerros) {                        
                        
                         %>
@@ -113,9 +100,9 @@
                         </tr>
                         <%
                             }
-}else{
-System.out.println("aun no has ingresado nada aqui");
-}
+                }else{ %>
+                        <td><% out.println("No hay perros"); %> </td>
+<%}
   %>                 
                 </tbody>  
             </table>
