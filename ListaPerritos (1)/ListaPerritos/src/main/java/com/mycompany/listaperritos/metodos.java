@@ -81,7 +81,7 @@ public class metodos {
             
        return nuPerros;
     }
-     public static Perros BuscarPerroPorNombre(String nombre, ArrayList<Perros> nuPerros){
+public static Perros BuscarPerroPorNombre(String nombre, ArrayList<Perros> nuPerros){
        
         for( Perros i : nuPerros){
                 

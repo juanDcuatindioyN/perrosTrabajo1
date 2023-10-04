@@ -47,7 +47,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     
      ArrayList<Perros> perros = metodos.cargarPerrosDesdeArchivo(context);
     // Directorio de carga en el servidor donde se guardarán las imágenes
-        Part fotoPart = request.getPart("foto");// Se llama la parte del archivo
+        Part fotoPart = request.getPart("/foto");// Se llama la parte del archivo
         
     String fileName=fotoPart.getSubmittedFileName();
             

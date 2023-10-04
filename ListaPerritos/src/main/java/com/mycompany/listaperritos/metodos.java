@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.listaperritos;
-
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +12,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -37,8 +37,7 @@ public class metodos {
       
       
       public static void guardarDatosDePerrosEnArchivo(ServletContext contexto, ArrayList<Perros> nuPerros) {
-         String p="ser/data.ser";
-         String path= contexto.getRealPath(p);
+         String path= contexto.getRealPath("ser/data.ser");
          File arc= new File (path);
         try {
            
@@ -82,6 +81,59 @@ public class metodos {
             
        return nuPerros;
     }
-         
-    
-}
+     public static Perros BuscarPerroPorNombre(String nombre, ArrayList<Perros> nuPerros){
+       
+        for( Perros i : nuPerros){
+                
+            if (i.getNombre().equals(nombre)){
+                
+                return i; // retorna el perro si se encuentra 
+            }
+        }
+        return null; // retorna null si no se encuentra el perro
+    }
+public static void BorrarPerro( String borrarNombre, ServletContext context) {
+        ArrayList<Perros> nuPerros = cargarPerrosDesdeArchivo (context); 
+        // Recorre la lista de perros
+        for (int i = 0; i < nuPerros.size(); i++) {
+            Perros p = nuPerros.get(i);
+
+            // Comprueba si el nombre del perro coincide con el nombre proporcionado
+            if (p.getNombre().equals(borrarNombre)) {
+
+                // Obtiene la ruta relativa de la carpeta de imágenes
+                String rutaRelativa = "/fotos/";
+
+                // Obtiene la ruta absoluta en el sistema de archivos
+                String rutaAbsoluta = context.getRealPath(rutaRelativa);
+
+                // Crea un objeto File para la carpeta de imágenes
+                File archivo = new File(rutaAbsoluta);
+
+                // Crea un objeto File para la imagen a eliminar
+                File borrarFoto = new File(archivo + "/" + p.getFoto());
+
+                // Verifica si la imagen existe y la elimina
+                if (borrarFoto.exists()) {
+                    // Elimina la imagen del sistema de archivos
+                    borrarFoto.delete();
+                    if (borrarFoto.delete()) {
+                        System.out.println("");
+                    } else {
+                        System.err.println("");
+                    }
+                } else {
+                    System.err.println("");
+                }
+
+                // Elimina el perro de la lista
+                nuPerros.remove(i);
+                i--; // Ajusta el índice después de eliminar el elemento
+            }
+        }
+        guardarDatosDePerrosEnArchivo(context,nuPerros );
+    }
+}        
+
+
+
